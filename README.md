@@ -11,7 +11,7 @@ import {
   SlotsContainer,
   Slot,
   SlotContent
-  } from 'stickyants-react-slot';
+  } from '@stickyants/react-slot';
 
 
 function MySidebar(){

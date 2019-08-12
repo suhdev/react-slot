@@ -1,7 +1,8 @@
 {
-  "name": "stickyants-react-slot",
-  "version": "1.0.0",
-  "description": "",
+  "name": "@stickyants/react-slot",
+  "version": "1.0.1",
+  "description": "A simple library package to provide Slot functionality for React apps",
+  "keywords": ["Slot", "React", "Slots"],
   "main": "lib/index.js",
   "scripts": {
     "prepublish": "tsc -p .",
@@ -30,5 +31,8 @@
     "tslint": "^5.18.0",
     "tslint-config-airbnb": "^5.11.1",
     "typescript": "^3.5.3"
+  },
+  "peerDependencies": {
+    "react": "^16.9.0"
   }
 }

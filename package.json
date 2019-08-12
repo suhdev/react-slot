@@ -1,0 +1,30 @@
+{
+  "name": "stickyants-react-slot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "prepublish": "tsc -p .",
+    "test": "jest src/.*.test.tsx --watch --env=jsdom"
+  },
+  "author": {
+    "name": "Suhail Abood",
+    "email": "suhail.abood@gmail.com",
+    "url": "https://www.suh.dev"
+  },
+  "license": "ISC",
+  "devDependencies": {
+    "@testing-library/dom": "^6.0.0",
+    "@testing-library/react": "^9.1.0",
+    "@types/jest": "^24.0.17",
+    "@types/react": "^16.9.1",
+    "@types/react-dom": "^16.8.5",
+    "jest": "^24.8.0",
+    "react": "^16.9.0",
+    "react-dom": "^16.9.0",
+    "ts-jest": "^24.0.2",
+    "tslint": "^5.18.0",
+    "tslint-config-airbnb": "^5.11.1",
+    "typescript": "^3.5.3"
+  }
+}

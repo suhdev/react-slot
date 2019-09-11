@@ -48,7 +48,9 @@ describe('react-slot', () => {
           () => {
             setTimeout(
               () => {
-                setView(<Slot name="test-2" />);
+                act(() => {
+                  setView(<Slot name="test-2" />);
+                });
               },
               250);
           },
@@ -63,13 +65,18 @@ describe('react-slot', () => {
         const { getByTestId: get } = render(
           <SlotsContainer>
             <div className="container">
-              <Slot name="test-1" />
+              <div data-testid="test-1-box">
+                <Slot name="test-1" />
+              </div>
               <div className="sub-container" data-testid="test-2">
                 <TestBox />
               </div>
+              <div data-testid="duplicate-test-1">
+                <Slot name="test-1" />
+              </div>
               <div className="empty-box">
                 Suhail
-            </div>
+              </div>
               <div className="with-subslot">
                 <div className="with-subslot" data-testid="test-3">
                   <Slot name="test-3" />
@@ -81,6 +88,9 @@ describe('react-slot', () => {
                 <SlotContent name="test-2">
                   <div>TEST 1 CONTENT</div>
                   <SlotContent name="test-3">
+                    <SlotContent name="test-1">
+                      TEST 333
+                    </SlotContent>
                     <div>TEST 2 CONTENT</div>
                   </SlotContent>
                 </SlotContent>
@@ -95,6 +105,8 @@ describe('react-slot', () => {
 
       expect(getByTestId('test-2').textContent).toEqual('TEST 1 CONTENT');
       expect(getByTestId('test-3').textContent).toEqual('TEST 2 CONTENT');
+      expect(getByTestId('duplicate-test-1').textContent).toEqual('TEST 333');
+      expect(getByTestId('test-1-box').textContent).toEqual('TEST 333');
     });
   });
 });

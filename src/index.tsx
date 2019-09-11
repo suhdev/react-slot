@@ -1,43 +1,64 @@
 import * as React from 'react';
 
+type ContentSetter = (view: React.ReactNode) => void;
+type ContentSetterCallback = (setter: ContentSetter) => void;
+type Dictionary<TValue> = {
+  [idx: string]: TValue[];
+};
+
 interface ISlotContext {
-  add(name: string, setContent: (v: React.ReactNode) => void);
-  remove(name: string);
+  add(name: string, setContent: ContentSetter): () => void;
   setView(name: string, view: React.ReactNode): boolean;
+  subscribe(name: string, callback: ContentSetterCallback): () => void;
 }
+
 const SlotContext = React.createContext<ISlotContext>(null);
 
 class SlotContoller implements ISlotContext {
-  slots = {};
-  pendingViews = {};
+  slots: Dictionary<ContentSetter>;
+  subscribers: Dictionary<ContentSetterCallback>;
   parentContext: ISlotContext;
 
   constructor(parentContext?: ISlotContext) {
     this.parentContext = parentContext;
+    this.slots = {};
+    this.subscribers = {};
   }
 
-  add(name: string, setContent: (v: React.ReactNode) => void) {
-    this.slots[name] = setContent;
-    if (this.pendingViews[name]) {
-      const view = this.pendingViews[name];
-      delete this.pendingViews[name];
-      this.setView(name, view);
+  add(name: string, setContent: ContentSetter) {
+    this.slots[name] = this.slots[name] || [];
+    this.slots[name] = [...this.slots[name], setContent];
+
+    if (this.subscribers[name]) {
+      for (const s of this.subscribers[name]) {
+        s(setContent);
+      }
     }
+
+    return () => {
+      this.slots[name] = this.slots[name].filter(s => s !== setContent);
+    };
   }
 
-  remove(name: string) {
-    delete this.slots[name];
+  subscribe(name: string, callback: ContentSetterCallback) {
+    this.subscribers[name] = this.subscribers[name] || [];
+    this.subscribers[name] = [...this.subscribers[name], callback];
+
+    return () => {
+      this.subscribers[name] = this.subscribers[name].filter(e => e !== callback);
+    };
+
   }
 
   setView(name: string, view: React.ReactNode) {
+
     if (this.slots[name]) {
-      this.slots[name](view);
+      this.slots[name].forEach(slot => slot(view));
       return true;
     }
     if (this.parentContext) {
       return this.parentContext.setView(name, view);
     }
-    this.pendingViews[name] = view;
     return false;
   }
 }
@@ -48,16 +69,16 @@ export function SlotsContainer({ children }) {
 
   return <SlotContext.Provider value={ctrl}>
     {children}
-  </SlotContext.Provider>
+  </SlotContext.Provider>;
 }
 
 export function Slot({ name }) {
   const [view, setView] = React.useState(null);
   const context = React.useContext(SlotContext);
 
-  React.useMemo(
+  React.useEffect(
     () => {
-      context.add(name, setView);
+      return context.add(name, setView);
     },
     [context]);
 
@@ -71,7 +92,10 @@ export function SlotContent({ name, children }) {
 
   React.useEffect(
     () => {
-      context.setView(name, children);
+      context.setView(name, () => children);
+      return context.subscribe(name, (setContent) => {
+        setContent(children);
+      });
     },
     [name, children]);
 
